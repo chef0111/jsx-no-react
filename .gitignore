@@ -1,0 +1,71 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Build output
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+.cache/
+.tmp/
+.vite/
+.parcel-cache/
+storybook-static/
+
+# Framework / tool specific
+.next/
+.nuxt/
+.sapper/
+ .turbo/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Package manager files (exclude if you intentionally track them)
+.pnp
+.pnp.js
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.user
+*.sln
+*.csproj
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+Icon?
+
+# TypeScript
+*.tsbuildinfo
+
+# Archives and packages
+*.tgz
+
+# Public uploads / user-generated files
+public/uploads/
+uploads/
+
+# Misc
+coverage/
