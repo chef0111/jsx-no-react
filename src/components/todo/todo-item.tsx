@@ -1,4 +1,5 @@
 import { createElement } from '@/jsx-runtime';
+import { Button } from '../library';
 
 interface TodoItemProps {
   key: number | string;
@@ -22,12 +23,12 @@ const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
       >
         {todo.text}
       </span>
-      <button
+      <Button
         onClick={() => onDelete(todo.id)}
-        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+        variant="destructive"
       >
         Delete
-      </button>
+      </Button>
     </div>
   );
 };

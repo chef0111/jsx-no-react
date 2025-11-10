@@ -2,6 +2,7 @@
 import TodoList from './todo-list';
 import { createElement, useState } from '../../jsx-runtime';
 import AddTodoForm from '@/components/todo/add-todo-form';
+import { Button } from '../library';
 
 // TODO: Implement main TodoApp component
 const TodoApp = () => {
@@ -48,28 +49,28 @@ const TodoApp = () => {
           <p className="text-gray-600 text-lg">Keep track of your tasks</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-xl border shadow-sm! p-8">
           <AddTodoForm onAdd={addTodo} />
 
           <div className="flex gap-2 mb-6">
-            <button
+            <Button
               onClick={() => setFilter('all')}
               className={filter === 'all' ? 'px-4 py-2 rounded-lg font-medium bg-blue-600 text-white' : 'px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-700'}
             >
               All ({totalCount})
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setFilter('active')}
               className={filter === 'active' ? 'px-4 py-2 rounded-lg font-medium bg-blue-600 text-white' : 'px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-700'}
             >
               Active ({activeCount})
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setFilter('completed')}
               className={filter === 'completed' ? 'px-4 py-2 rounded-lg font-medium bg-blue-600 text-white' : 'px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-700'}
             >
               Completed ({completedCount})
-            </button>
+            </Button>
           </div>
 
           <TodoList todos={filteredTodos} onToggle={toggleTodo} onDelete={deleteTodo} />

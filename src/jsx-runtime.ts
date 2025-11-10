@@ -70,9 +70,15 @@ export function renderToDOM(vnode: VNode | string | number | null | undefined): 
       // Feature 1: Refs Support
       if (key === 'ref' && typeof value === 'function') {
         value(element);
-      } else if (key === 'className') {
+        return;
+      }
+
+      if (key === 'className') {
         element.setAttribute('class', value);
-      } else if (key === 'style') {
+        return;
+      }
+
+      if (key === 'style') {
         // Feature 2: Enhanced Style Handling
         if (typeof value === 'string') {
           element.setAttribute('style', value);
@@ -81,14 +87,46 @@ export function renderToDOM(vnode: VNode | string | number | null | undefined): 
             (element.style as any)[styleKey] = styleValue;
           });
         }
-      } else if (key.startsWith('on')) {
+        return;
+      }
+
+      // Special handling for form/value props to keep input behavior predictable
+      if (key === 'value') {
+        if ((element as HTMLInputElement).value !== undefined) {
+          try {
+            (element as HTMLInputElement).value = value as any;
+          } catch (err) {
+            element.setAttribute('value', String(value));
+          }
+        } else {
+          element.setAttribute('value', String(value));
+        }
+        return;
+      }
+
+      if (key === 'checked') {
+        if ((element as HTMLInputElement).checked !== undefined) {
+          (element as HTMLInputElement).checked = Boolean(value);
+        } else if (value) {
+          element.setAttribute('checked', '');
+        }
+        return;
+      }
+
+      if (key.startsWith('on')) {
         const eventName = key.substring(2).toLowerCase();
         element.addEventListener(eventName, value);
-      } else if (typeof value === 'boolean') {
+        return;
+      }
+
+      if (typeof value === 'boolean') {
         if (value) {
           element.setAttribute(key, '');
         }
-      } else if (value != null) {
+        return;
+      }
+
+      if (value != null) {
         element.setAttribute(key, String(value));
       }
     });
@@ -123,31 +161,39 @@ export function mount(vnode: VNode, container: HTMLElement): void {
 // Trigger re-render
 function rerender() {
   if (currentComponent && currentContainer) {
-    // Store the active element and its selection
-    const activeElement = document.activeElement as HTMLInputElement;
-    const isInput = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');
-    const selectionStart = isInput ? activeElement.selectionStart : null;
-    const selectionEnd = isInput ? activeElement.selectionEnd : null;
-    const activeValue = isInput ? activeElement.value : null;
-    
+    // Store the active element and its selection index among inputs
+    const activeElement = document.activeElement as HTMLElement | null;
+    const isInput = !!(activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA'));
+    let inputIndex: number | null = null;
+    let selectionStart: number | null = null;
+    let selectionEnd: number | null = null;
+
+    if (isInput && currentContainer) {
+      const inputsBefore = currentContainer.querySelectorAll('input, textarea');
+      inputIndex = Array.prototype.indexOf.call(inputsBefore, activeElement as Node);
+      selectionStart = (activeElement as HTMLInputElement).selectionStart;
+      selectionEnd = (activeElement as HTMLInputElement).selectionEnd;
+    }
+
     // Reset state index before re-rendering
     stateIndex = 0;
-    
+
     currentContainer.innerHTML = '';
     const domNode = renderToDOM(currentComponent);
     currentContainer.appendChild(domNode);
-    
-    // Restore focus and selection
-    if (isInput && activeValue !== null) {
-      const inputs = currentContainer.querySelectorAll('input, textarea');
-      for (let i = 0; i < inputs.length; i++) {
-        const input = inputs[i] as HTMLInputElement;
-        if (input.value === activeValue) {
-          input.focus();
-          if (selectionStart !== null && selectionEnd !== null) {
+
+    // Restore focus and selection by index (safer than matching by value)
+    if (isInput && inputIndex !== null && inputIndex >= 0) {
+      const inputsAfter = currentContainer.querySelectorAll('input, textarea');
+      if (inputIndex < inputsAfter.length) {
+        const input = inputsAfter[inputIndex] as HTMLInputElement;
+        input.focus();
+        if (selectionStart !== null && selectionEnd !== null) {
+          try {
             input.setSelectionRange(selectionStart, selectionEnd);
+          } catch (err) {
+            // ignore if setSelectionRange isn't supported
           }
-          break;
         }
       }
     }

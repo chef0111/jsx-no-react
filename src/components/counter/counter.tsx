@@ -22,7 +22,7 @@ const Counter = ({ initialCount }: CounterProps) => {
   };
 
   return (
-    <div className="counter bg-white p-5 rounded-lg shadow-lg max-w-md">
+    <div className="counter bg-white p-5 border rounded-lg shadow-lg max-w-md">
       <h2 className="m-0 mb-5 text-blue-600 text-2xl">Count: {count}</h2>
       <div className="buttons flex gap-2.5">
         <Button onClick={increment}>+</Button>
