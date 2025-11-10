@@ -65,15 +65,22 @@ export function renderToDOM(vnode: VNode | string | number | null | undefined): 
 
   const element = document.createElement(vnode.type as string);
 
-  // Only process props if they exist and are not null
   if (vnode.props && typeof vnode.props === 'object') {
     Object.entries(vnode.props).forEach(([key, value]) => {
-      if (key === 'className') {
+      // Feature 1: Refs Support
+      if (key === 'ref' && typeof value === 'function') {
+        value(element);
+      } else if (key === 'className') {
         element.setAttribute('class', value);
-      } else if (key === 'style' && typeof value === 'object') {
-        Object.entries(value).forEach(([styleKey, styleValue]) => {
-          (element.style as any)[styleKey] = styleValue;
-        });
+      } else if (key === 'style') {
+        // Feature 2: Enhanced Style Handling
+        if (typeof value === 'string') {
+          element.setAttribute('style', value);
+        } else if (typeof value === 'object' && value !== null) {
+          Object.entries(value).forEach(([styleKey, styleValue]) => {
+            (element.style as any)[styleKey] = styleValue;
+          });
+        }
       } else if (key.startsWith('on')) {
         const eventName = key.substring(2).toLowerCase();
         element.addEventListener(eventName, value);
@@ -82,7 +89,6 @@ export function renderToDOM(vnode: VNode | string | number | null | undefined): 
           element.setAttribute(key, '');
         }
       } else if (value != null) {
-        // Handle regular attributes
         element.setAttribute(key, String(value));
       }
     });
